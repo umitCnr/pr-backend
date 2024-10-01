@@ -35,6 +35,13 @@ dependencies {
 
 	implementation 'com.google.firebase:firebase-admin:9.3.0'
 
+	implementation 'com.google.cloud:google-cloud-firestore:3.0.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.postgresql:postgresql'
+
+
 }
 
 tasks.named('test') {
