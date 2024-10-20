@@ -46,7 +46,7 @@ public class FishService {
     public void deleteFish(Long id){
 
         FishEntity entity = repo.findById(id).orElseThrow(() -> new RuntimeException("balık bulunamadı!" +id));
-        repo.delete(entity);
+        repo.deleteById(entity.getId());
     }
 
 }

@@ -5,30 +5,27 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Entity
+@Table(name = "omurgasiz")
 @Getter
 @Setter
-@Entity
-@Table(name = "fish")
-public class FishEntity extends MainEntity {
+public class OmurgasizEntity extends MainEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name")
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "kind", nullable = false)
-    private Kind kind;
-
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "img_url")
-    private int url;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "kind",nullable = false)
+    private Kind kind;
 
     public enum Kind {
-        TUZLU, TATLI
+        TATLI, TUZLU
     }
 }

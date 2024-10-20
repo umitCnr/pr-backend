@@ -8,27 +8,32 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "fish")
-public class FishEntity extends MainEntity {
+@Table(name = "bitki")
+public class BitkiEntity extends MainEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name",nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "kind", nullable = false)
+    @Column(name = "kind",nullable = false)
     private Kind kind;
 
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Column(name = "min_temperature",nullable = false)
+    private long min_temp;
 
-    @Column(name = "img_url")
-    private int url;
+    @Column(name = "max_temperature",nullable = false)
+    private long max_temp;
+
+    @Column(name = "description",nullable = false)
+    private String description;
 
     public enum Kind {
         TUZLU, TATLI
     }
+
+
 }
