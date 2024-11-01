@@ -26,7 +26,7 @@ public class FishEntity extends MainEntity {
     private String description;
 
     @Column(name = "img_url")
-    private int url;
+    private String url;
 
     public enum Kind {
         TUZLU, TATLI

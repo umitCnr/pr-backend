@@ -1,6 +1,5 @@
 package com.pr.project_backend.service;
 
-import com.google.firebase.messaging.LightSettings;
 import com.pr.project_backend.data.OmurgasizEntity;
 import com.pr.project_backend.repository.OmurgasizRepo;
 import lombok.RequiredArgsConstructor;
