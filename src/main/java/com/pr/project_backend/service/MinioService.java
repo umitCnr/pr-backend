@@ -43,7 +43,7 @@ public class MinioService {
         }
     }
 
-    public String  getAllFile(String fileName) {
+    public String getAllFile(String fileName) {
         try (InputStream inputStream = client.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucketName)
@@ -65,4 +65,19 @@ public class MinioService {
             return null;
         }
     }
+
+    public void deleteFile(String fileName) {
+        try {
+
+            client.removeObject(RemoveObjectArgs.builder()
+                    .object(fileName)
+                    .bucket(bucketName)
+                    .build());
+
+        } catch (Exception e) {
+            System.out.println("resim silinemedi :" + e);
+        }
+    }
+
+
 }

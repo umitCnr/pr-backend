@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class FishService {
     private final FishRepo repo;
     private final MinioService service;
 
-    public List<AkvaryumDto> getFishAll(){
+    public List<AkvaryumDto> getFishAll() {
         List<FishEntity> fishEntities = repo.findAll();
         List<AkvaryumDto> fishDtos = new ArrayList<>();
 
@@ -29,6 +30,7 @@ public class FishService {
             fishDto.setName(fishEntity.getName());
             fishDto.setKind(fishEntity.getKind());
             fishDto.setDescription(fishEntity.getDescription());
+            fishDto.setTime(fishEntity.getTime());
             try {
                 String base64Image = service.getAllFile(fishEntity.getUrl());
                 fishDto.setImgUrl(base64Image);
@@ -43,8 +45,30 @@ public class FishService {
         return fishDtos;
     }
 
-    public List<FishEntity> getKindToFish(FishEntity.Kind kind) {
-        return repo.findByKind(kind);
+    public List<AkvaryumDto> getKindToFish(FishEntity.Kind kind) {
+
+        List<FishEntity> fishEntities = repo.findByKind(kind);
+        List<AkvaryumDto> fishDtos = new ArrayList<>();
+
+        for (FishEntity fishEntity : fishEntities) {
+            AkvaryumDto fishDto = new AkvaryumDto();
+            fishDto.setId(fishEntity.getId());
+            fishDto.setName(fishEntity.getName());
+            fishDto.setKind(fishEntity.getKind());
+            fishDto.setDescription(fishEntity.getDescription());
+            fishDto.setTime(fishEntity.getTime());
+            try {
+                String base64Image = service.getAllFile(fishEntity.getUrl());
+                fishDto.setImgUrl(base64Image);
+            } catch (Exception e) {
+                System.out.println("Resim alınırken hata oluştu: " + e.getMessage());
+                fishDto.setImgUrl(null);
+            }
+
+            fishDtos.add(fishDto);
+        }
+
+        return fishDtos;
     }
 
     public FishEntity saveFish(MultipartFile file, FishEntity fishEntity) throws IOException {
@@ -67,21 +91,15 @@ public class FishService {
     }
 
 
-    public FishEntity updateFish(Long id, FishEntity fishEntity) {
-
-        FishEntity entity = repo.findById(id).orElseThrow(() -> new RuntimeException("güncellenecek balık bulunamadı!" + id));
-
-        entity.setName(fishEntity.getName());
-        entity.setKind(fishEntity.getKind());
-        entity.setDescription(fishEntity.getDescription());
-        entity.setUrl(fishEntity.getUrl());
-
-        return repo.save(entity);
-    }
-
     public void deleteFish(Long id) {
 
         FishEntity entity = repo.findById(id).orElseThrow(() -> new RuntimeException("balık bulunamadı!" + id));
+
+        if (entity.getUrl() != null) {
+            String fileName = entity.getUrl();
+            service.deleteFile(fileName);
+        }
+
         repo.deleteById(entity.getId());
     }
 

@@ -25,6 +25,9 @@ public class OmurgasizEntity extends MainEntity {
     @Column(name = "kind",nullable = false)
     private Kind kind;
 
+    @Column(name = "img_url", nullable = false)
+    private String url;
+
     public enum Kind {
         TATLI, TUZLU
     }
