@@ -62,7 +62,7 @@ public class FishController {
     public ResponseEntity<FishEntity> deleteFish(@PathVariable Long id) {
 
         service.deleteFish(id);
-        return ResponseEntity.noContent().build();//204 durumu
+        return ResponseEntity.noContent().build();
     }
 
 }

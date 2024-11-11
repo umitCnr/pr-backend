@@ -23,9 +23,9 @@ public class OmurgasizEntity extends MainEntity {
 
     @Enumerated(value = EnumType.STRING)
     @Column(name = "kind",nullable = false)
-    private Kind kind;
+    private OmurgasizEntity.Kind kind;
 
-    @Column(name = "img_url", nullable = false)
+    @Column(name = "img_url")
     private String url;
 
     public enum Kind {

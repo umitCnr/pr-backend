@@ -1,10 +1,16 @@
 package com.pr.project_backend.service;
 
+import com.pr.project_backend.Dto.AkvaryumDto;
+import com.pr.project_backend.Dto.OmurgasizDto;
+import com.pr.project_backend.data.FishEntity;
 import com.pr.project_backend.data.OmurgasizEntity;
 import com.pr.project_backend.repository.OmurgasizRepo;
+import com.sun.tools.jconsole.JConsoleContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,19 +19,75 @@ import java.util.Optional;
 public class OmurgasizService {
 
     private final OmurgasizRepo repo;
+    private final MinioService service;
 
-    public List<OmurgasizEntity> getAllOmurgasiz() {
+    public List<OmurgasizDto> getOmurgasizAll() {
 
-        return repo.findAll();
+        List<OmurgasizEntity> fishEntities = repo.findAll();
+        List<OmurgasizDto> fishDtos = new ArrayList<>();
+
+        for (OmurgasizEntity omurgasizEntity : fishEntities) {
+            OmurgasizDto omurgasizDto = new OmurgasizDto();
+            omurgasizDto.setId(omurgasizEntity.getId());
+            omurgasizDto.setName(omurgasizEntity.getName());
+            omurgasizDto.setKind(omurgasizEntity.getKind());
+            omurgasizDto.setDescription(omurgasizEntity.getDescription());
+            omurgasizDto.setTime(omurgasizEntity.getTime());
+            try {
+                String base64Image = service.getAllFile(omurgasizEntity.getUrl());
+                omurgasizDto.setImgUrl(base64Image);
+            } catch (Exception e) {
+                System.out.println("Resim alınırken hata oluştu: " + e.getMessage());
+                omurgasizDto.setImgUrl(null);
+            }
+
+            fishDtos.add(omurgasizDto);
+        }
+
+        return fishDtos;
     }
 
-    public List<OmurgasizEntity> getByKind(OmurgasizEntity.Kind kind) {
+    public List<OmurgasizDto> getKindToOmurgasiz(OmurgasizEntity.Kind kind) {
 
-        return repo.findByKind(kind);
+        List<OmurgasizEntity> entities = repo.findByKind(kind);
+        List<OmurgasizDto> omurgasizDtos = new ArrayList<>();
+
+        for (OmurgasizEntity entity : entities) {
+            OmurgasizDto omurgasizDto = new OmurgasizDto();
+
+
+            omurgasizDto.setId(entity.getId());
+            omurgasizDto.setName(entity.getName());
+            omurgasizDto.setKind(entity.getKind());
+            omurgasizDto.setDescription(entity.getDescription());
+            omurgasizDto.setTime(entity.getTime());
+
+            try {
+                String base64Image = service.getAllFile(entity.getUrl());
+                omurgasizDto.setImgUrl(base64Image);
+            } catch (Exception e) {
+                System.out.println("Resim alınırken hata oluştu: " + e.getMessage());
+                omurgasizDto.setImgUrl(null);
+            }
+
+            omurgasizDtos.add(omurgasizDto);
+        }
+
+        return omurgasizDtos;
     }
 
-    public OmurgasizEntity saveOmurgasiz(OmurgasizEntity entity) {
+    public OmurgasizEntity saveOmurgasiz(OmurgasizEntity entity, MultipartFile file) {
 
+        String getImg = file.getOriginalFilename();
+
+        try {
+
+            String uploadOmurgasiz = service.uploadImageMinio(file, getImg);
+            entity.setUrl(uploadOmurgasiz);
+
+        } catch (Exception e) {
+            System.out.println("omurgasız data yükleyemedi");
+        }
         return repo.save(entity);
     }
 
@@ -34,19 +96,17 @@ public class OmurgasizService {
         return repo.findById(id);
     }
 
-    public OmurgasizEntity updateOmurgasiz(Long id, OmurgasizEntity omurgasizEntity) {
 
-        OmurgasizEntity entity = repo.findById(id).orElseThrow(() -> new RuntimeException("Omurgasiz Canlı seçilmedi"));
+    public void deleteFish(Long id) {
 
-        entity.setName(omurgasizEntity.getName());
-        entity.setDescription(omurgasizEntity.getDescription());
-        entity.setKind(omurgasizEntity.getKind());
+        OmurgasizEntity entity = repo.findById(id).orElseThrow(() -> new RuntimeException("balık bulunamadı!" + id));
 
-        return repo.save(entity);
-    }
+        if (entity.getUrl() != null) {
+            String fileName = entity.getUrl();
+            service.deleteFile(fileName);
+        }
 
-    public void deleteOmurgasiz(Long id){
-        repo.deleteById(id);
+        repo.deleteById(entity.getId());
     }
 
 }

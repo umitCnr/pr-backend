@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class MainEntity {
 
-    @Column(name = "time")
+    @Column(name = "time",updatable = false)
     private LocalDateTime time;
 
     @Column(name = "update_time")

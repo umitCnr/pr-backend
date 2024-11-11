@@ -1,13 +1,18 @@
 package com.pr.project_backend.controller;
 
 
+import com.pr.project_backend.Dto.OmurgasizDto;
+import com.pr.project_backend.data.FishEntity;
 import com.pr.project_backend.data.OmurgasizEntity;
 import com.pr.project_backend.service.OmurgasizService;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,48 +24,45 @@ public class OmurgasizController {
     private final OmurgasizService service;
 
     @GetMapping("/getAll")
-    private ResponseEntity<List<OmurgasizEntity>> getAllOmurgasiz() {
+    private ResponseEntity<List<OmurgasizDto>> getAllOmurgasiz() {
 
-        List<OmurgasizEntity> entities = service.getAllOmurgasiz();
+        List<OmurgasizDto> dtos = service.getOmurgasizAll();
 
-        return ResponseEntity.ok(entities);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/getKind/{kind}")
-    private ResponseEntity<List<OmurgasizEntity>> getByKind(@PathVariable OmurgasizEntity.Kind kind) {
-        List<OmurgasizEntity> entities = service.getByKind(kind);
+    private ResponseEntity<List<OmurgasizDto>> getByKind(@PathVariable OmurgasizEntity.Kind kind) {
+        List<OmurgasizDto> entities = service.getKindToOmurgasiz(kind);
 
         return entities.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(entities);
     }
 
     @PostMapping("/save")
-    private ResponseEntity<OmurgasizEntity> saveOmurgasiz(@RequestBody OmurgasizEntity omurgasizEntity) {
+    private ResponseEntity<OmurgasizEntity> saveOmurgasiz(@RequestParam("file") MultipartFile file,
+                                                          @RequestParam("name") String name,
+                                                          @RequestParam("kind") OmurgasizEntity.Kind kind,
+                                                          @RequestParam("description") String description) {
 
-        OmurgasizEntity entity = service.saveOmurgasiz(omurgasizEntity);
+        OmurgasizEntity entity = new OmurgasizEntity();
+        entity.setName(name);
+        entity.setKind(kind);
+        entity.setDescription(description);
 
-        return ResponseEntity.ok(entity);
-    }
-
-    @PutMapping("/update/{id}")
-    private ResponseEntity<OmurgasizEntity> updateOmurgasiz(@PathVariable Long id, @RequestBody OmurgasizEntity omurgasizEntity) {
-
-        Optional<OmurgasizEntity> entity = service.findByOptianal(id);
-
-        if (entity.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            OmurgasizEntity update = service.updateOmurgasiz(id, omurgasizEntity);
-            return ResponseEntity.ok(update);
+        try {
+            OmurgasizEntity omurgasizEntity = service.saveOmurgasiz(entity, file);
+            return ResponseEntity.ok(omurgasizEntity);
+        } catch (Exception e) {
+            System.out.println("yüklenemedi");
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(null);
         }
     }
 
 
-    @DeleteMapping("/delete/{id}")
-    private ResponseEntity<String> deleteOmurgasiz(@PathVariable Long id) {
-        Optional<OmurgasizEntity> entity = service.findByOptianal(id);
-        if (entity.isPresent()) {
-            service.deleteOmurgasiz(id);
-            return ResponseEntity.ok("Omurgasız canlı başarıyla silindi!");
-        } else return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Omurgasız canlı bulunamadı, silinemedi!");
+    @DeleteMapping("/del/{id}")
+    public ResponseEntity<OmurgasizEntity> deleteFish(@PathVariable Long id) {
+
+        service.deleteFish(id);
+        return ResponseEntity.noContent().build();
     }
 }

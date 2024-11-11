@@ -31,7 +31,7 @@ public class BitkiEntity extends MainEntity {
     @Column(name = "description",nullable = false)
     private String description;
 
-    @Column(name = "img_url", nullable = false)
+    @Column(name = "img_url")
     private String url;
 
     public enum Kind {

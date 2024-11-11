@@ -21,6 +21,7 @@ public class FishService {
     private final MinioService service;
 
     public List<AkvaryumDto> getFishAll() {
+
         List<FishEntity> fishEntities = repo.findAll();
         List<AkvaryumDto> fishDtos = new ArrayList<>();
 
@@ -52,6 +53,8 @@ public class FishService {
 
         for (FishEntity fishEntity : fishEntities) {
             AkvaryumDto fishDto = new AkvaryumDto();
+
+
             fishDto.setId(fishEntity.getId());
             fishDto.setName(fishEntity.getName());
             fishDto.setKind(fishEntity.getKind());
